@@ -1,0 +1,4 @@
+easyocr==1.6.2
+Pillow==9.3.0
+pywin32==305
+win32gui==221.6
