@@ -117,23 +117,19 @@ if __name__ == '__main__':
                 if max > 0.4:
                     file_name = time.strftime("%Y-%m-%d_%H-%M-%S") + ".jpg"
                     img.save(file_name)
-                    print("=================pytesseract========================")
-                    tmp = pytesseract.image_to_string(Image.open('tmp.jpg'), lang='chi_sim')
-                    tmp = tmp.replace("\n", "").replace(" ", "")
-                    print(tmp)
-                    print("=================easyocr========================")
+
                     print(question_str)
                     print(max, result, result['ans'])
-                    # if(result['ans'] == '对'):
-                    #     win32api.SetCursorPos([left+166,top+930])
-                    #     win32api.mouse_event(win32con.MOUSEEVENTF_LEFTUP | win32con.MOUSEEVENTF_LEFTDOWN, 0, 0, 0, 0)
-                    #     time.sleep(0.01)
-                    #     win32api.mouse_event(win32con.MOUSEEVENTF_LEFTUP | win32con.MOUSEEVENTF_LEFTDOWN, 0, 0, 0, 0)
+                    if(result['ans'] == '对'):
+                        win32api.SetCursorPos([left+166,top+930])
+                        win32api.mouse_event(win32con.MOUSEEVENTF_LEFTUP | win32con.MOUSEEVENTF_LEFTDOWN, 0, 0, 0, 0)
+                        time.sleep(0.01)
+                        win32api.mouse_event(win32con.MOUSEEVENTF_LEFTUP | win32con.MOUSEEVENTF_LEFTDOWN, 0, 0, 0, 0)
 
-                    # if(result['ans'] == '错'):
-                    #     win32api.SetCursorPos([left+422,top+923])
-                    #     win32api.mouse_event(win32con.MOUSEEVENTF_LEFTUP | win32con.MOUSEEVENTF_LEFTDOWN, 0, 0, 0, 0)
-                    #     time.sleep(0.01)
-                    #     win32api.mouse_event(win32con.MOUSEEVENTF_LEFTUP | win32con.MOUSEEVENTF_LEFTDOWN, 0, 0, 0, 0)
+                    if(result['ans'] == '错'):
+                        win32api.SetCursorPos([left+422,top+923])
+                        win32api.mouse_event(win32con.MOUSEEVENTF_LEFTUP | win32con.MOUSEEVENTF_LEFTDOWN, 0, 0, 0, 0)
+                        time.sleep(0.01)
+                        win32api.mouse_event(win32con.MOUSEEVENTF_LEFTUP | win32con.MOUSEEVENTF_LEFTDOWN, 0, 0, 0, 0)
 
             time.sleep(0.2)
