@@ -43,15 +43,6 @@ def read_ans(file_name):
 
 
 if __name__ == '__main__':
-    dms = ctypes.windll.LoadLibrary(r'G:\python\xianyu_helper\RegDll.dll')
-
-    dms.SetDllPathW(r'data/dm.dll', 0)
-    dm = CreateObject('dm.dmsoft')
-    print(dm.Ver())
-
-    print(stri_similar('咸鱼之王里宝箱积分达分时可一键领取累计积分奖励宝箱',
-          '《咸鱼之王》里宝箱积分达1000分时，可一键领取累计积分奖励宝箱。'))
-
     classname = "Chrome_WidgetWin_0"
     titlename = "咸鱼之王"
     # 获取句柄
