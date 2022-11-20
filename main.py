@@ -66,9 +66,6 @@ if __name__ == '__main__':
     titlename = "咸鱼之王"
     # 获取句柄
     hwnd = win32gui.FindWindow(classname, titlename)
-    # 获取窗口左上角和右下角坐标
-    left, top, right, bottom = win32gui.GetWindowRect(hwnd)
-    print("识别到小程序位置：", left, top, right, bottom)
 
     ans = read_ans('ans.txt')
 
@@ -78,15 +75,22 @@ if __name__ == '__main__':
     question_str_old = ""
 
     while True:
+         # 获取窗口左上角和右下角坐标
+        left, top, right, bottom = win32gui.GetWindowRect(hwnd)
+        print("识别到小程序位置：", left, top, right, bottom)
+        # 截取题目
         img = ImageGrab.grab(
             bbox=(left+25, top+141, left+25 + 419, top+141 + 130))
-        print(win32gui.ClientToScreen(hwnd, (204, 182)))
-        print(win32gui.ClientToScreen(hwnd, (398, 224)))
+        
+        # 计算关卡位置
+        (x1,y1) = win32gui.ClientToScreen(hwnd, (204, 182))
+        (x2,y2) = win32gui.ClientToScreen(hwnd, (398, 224))
+        print(x1, y1, x2, y2)
         
         game_level = 0
         time_start = datetime.now()
 
-        img = ImageGrab.grab(bbox=(1971, 355, 2165, 397))
+        img = ImageGrab.grab(bbox=(x1, y1, x2, y2))
         result = reader.readtext(cv2.cvtColor(nm.array(img), cv2.COLOR_BGR2GRAY))
         if len(result) > 0:
             game_level = result[0][1]
@@ -96,7 +100,7 @@ if __name__ == '__main__':
         while True:
             loop_count = loop_count + 1
             if loop_count % 1000 == 0:
-                img = ImageGrab.grab(bbox=(1971, 355, 2165, 397))
+                img = ImageGrab.grab(bbox=(x1, y1, x2, y2))
                 result = reader.readtext(cv2.cvtColor(nm.array(img), cv2.COLOR_BGR2GRAY))
                 if len(result) > 0 and result[0][1] != game_level:
                     game_level = result[0][1]
