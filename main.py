@@ -1,28 +1,13 @@
 from PIL import ImageGrab, Image
 import easyocr
-import re
 import os
 import json
-import difflib
-import time
-import win32gui
-import win32api
-import win32con
+
+
 import cv2
 import numpy as nm
 from datetime import datetime
 from loguru import logger
-
-
-
-def stri_similar(s1, s2):
-    return difflib.SequenceMatcher(None, s1, s2).quick_ratio()
-
-
-def find_chinese(file):
-    pattern = re.compile(r'[^\u4e00-\u9fa5]')
-    chinese = re.sub(pattern, '', file)
-    return chinese
 
 
 def read_ans(file_name):
@@ -46,23 +31,8 @@ def read_ans(file_name):
                 print(e)
         return ans
 
-def left_click_position(hwd, x_position, y_position, sleep_time):
-    """鼠标左点击"""
-    # 将两个16位的值连接成一个32位的地址坐标
-    long_position = win32api.MAKELONG(x_position, y_position)
-    # 点击左键
-    win32api.SendMessage(hwd, win32con.WM_LBUTTONDOWN, win32con.MK_LBUTTON, long_position)
-    win32api.SendMessage(hwd, win32con.WM_LBUTTONUP, win32con.MK_LBUTTON, long_position)
-    time.sleep(sleep_time)
-
-def get_mouse_position():
-    """获取鼠标位置"""
-    return win32api.GetCursorPos()
 
 if __name__ == '__main__':
-
-    #time.sleep(5)
-    #print(get_mouse_position())
 
     classname = "Chrome_WidgetWin_0"
     titlename = "咸鱼之王"
@@ -78,22 +48,23 @@ if __name__ == '__main__':
     question_str_old = ""
 
     while True:
-         # 获取窗口左上角和右下角坐标
+        # 获取窗口左上角和右下角坐标
         left, top, right, bottom = win32gui.GetWindowRect(hwnd)
         logger.info("咸鱼之王屏幕坐标：{} {} {} {}", left, top, right, bottom)
         # 截取题目
         img = ImageGrab.grab(
             bbox=(left+25, top+141, left+25 + 419, top+141 + 130))
-        
+
         # 计算关卡位置
-        (x1,y1) = win32gui.ClientToScreen(hwnd, (204, 182))
-        (x2,y2) = win32gui.ClientToScreen(hwnd, (398, 224))
-        
+        (x1, y1) = win32gui.ClientToScreen(hwnd, (204, 182))
+        (x2, y2) = win32gui.ClientToScreen(hwnd, (398, 224))
+
         game_level = 0
         time_start = datetime.now()
 
         img = ImageGrab.grab(bbox=(x1, y1, x2, y2))
-        result = reader.readtext(cv2.cvtColor(nm.array(img), cv2.COLOR_BGR2GRAY))
+        result = reader.readtext(cv2.cvtColor(
+            nm.array(img), cv2.COLOR_BGR2GRAY))
         if len(result) > 0:
             game_level = result[0][1]
             logger.info("启动脚本，检测当前关卡：{}", game_level)
@@ -103,7 +74,8 @@ if __name__ == '__main__':
             loop_count = loop_count + 1
             if loop_count % 1000 == 0:
                 img = ImageGrab.grab(bbox=(x1, y1, x2, y2))
-                result = reader.readtext(cv2.cvtColor(nm.array(img), cv2.COLOR_BGR2GRAY))
+                result = reader.readtext(cv2.cvtColor(
+                    nm.array(img), cv2.COLOR_BGR2GRAY))
                 if len(result) > 0 and result[0][1] != game_level:
                     game_level = result[0][1]
                     time_consume = (datetime.now() - time_start)
