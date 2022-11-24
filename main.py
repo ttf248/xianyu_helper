@@ -70,6 +70,7 @@ if __name__ == '__main__':
     hwnd = win32gui.FindWindow(classname, titlename)
 
     ans = read_ans('ans.txt')
+    logger.info("读取题库：{}", len(ans))
 
     reader = easyocr.Reader(['ch_sim', 'en'])
 
