@@ -14,7 +14,7 @@ from loguru import logger
 
 class xianyu:
 
-    def __init__(self):
+    def __init__(self, ocr_reader):
         """初始化"""
 
         # 获取句柄
@@ -34,8 +34,8 @@ class xianyu:
         # 设置为前台
         win32gui.SetForegroundWindow(self.hwnd)
 
-        # 初始化 OCR
-        self.reader = easyocr.Reader(['ch_sim', 'en'])
+        # 公用OCR，初始化太慢
+        self.reader = ocr_reader
 
     def read_ans(self, file_name):
         """读取答案"""
@@ -165,6 +165,6 @@ class xianyu:
 
 
 if __name__ == '__main__':
-    xianyu = xianyu()
+    xianyu = xianyu(easyocr.Reader(['ch_sim', 'en']))
     xianyu.task_auto_pass()
     xianyu.task_auto_answer()
