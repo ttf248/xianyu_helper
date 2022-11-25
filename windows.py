@@ -1,10 +1,14 @@
 # https://github.com/xzkzdx/WeChatPC/blob/cde6285798fc0e0b424808308f2655db6bd9cfe1/examples/wechat_windows.py
 
+import cv2
 import win32gui
 import win32api
 import win32con
 import time
 import win32clipboard
+from ctypes import windll, byref, c_ubyte
+from ctypes.wintypes import RECT, HWND
+import numpy as np
 
 
 def find_hwd(class_name, window_name):
@@ -95,3 +99,57 @@ def click_combination_keys(hwd, *args):
         win32api.SendMessage(hwd, win32con.WM_SYSKEYDOWN, arg, 0)
     for arg in args:
         win32api.SendMessage(hwd, win32con.WM_SYSKEYUP, arg, 0)
+
+
+def capture(handle: HWND):
+    """窗口客户区截图
+
+    Args:
+        handle (HWND): 要截图的窗口句柄
+
+    Returns:
+        numpy.ndarray: 截图数据
+    """
+
+    GetDC = windll.user32.GetDC
+    CreateCompatibleDC = windll.gdi32.CreateCompatibleDC
+    GetClientRect = windll.user32.GetClientRect
+    CreateCompatibleBitmap = windll.gdi32.CreateCompatibleBitmap
+    SelectObject = windll.gdi32.SelectObject
+    BitBlt = windll.gdi32.BitBlt
+    SRCCOPY = 0x00CC0020
+    GetBitmapBits = windll.gdi32.GetBitmapBits
+    DeleteObject = windll.gdi32.DeleteObject
+    ReleaseDC = windll.user32.ReleaseDC
+
+    # 排除缩放干扰
+    windll.user32.SetProcessDPIAware()
+
+    # 获取窗口客户区的大小
+    r = RECT()
+    GetClientRect(handle, byref(r))
+    width, height = r.right, r.bottom
+    # 开始截图
+    dc = GetDC(handle)
+    cdc = CreateCompatibleDC(dc)
+    bitmap = CreateCompatibleBitmap(dc, width, height)
+    SelectObject(cdc, bitmap)
+    BitBlt(cdc, 0, 0, width, height, dc, 0, 0, SRCCOPY)
+    # 截图是BGRA排列，因此总元素个数需要乘以4
+    total_bytes = width*height*4
+    buffer = bytearray(total_bytes)
+    byte_array = c_ubyte*total_bytes
+    GetBitmapBits(bitmap, total_bytes, byte_array.from_buffer(buffer))
+    DeleteObject(bitmap)
+    DeleteObject(cdc)
+    ReleaseDC(handle, dc)
+    # 返回截图数据为numpy.ndarray
+    return np.frombuffer(buffer, dtype=np.uint8).reshape(height, width, 4)
+
+
+if __name__ == "__main__":
+    
+    handle = find_hwd("HLBRMainUI", "火绒安全软件")
+    image = capture(handle)
+    cv2.imshow("Capture Test", image)
+    cv2.waitKey()
