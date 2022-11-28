@@ -135,8 +135,8 @@ class xianyu:
         """自动过关"""
 
         # 计算关卡位置
-        (x1, y1) = win32gui.ClientToScreen(self.hwnd, (204, 182))
-        (x2, y2) = win32gui.ClientToScreen(self.hwnd, (398, 224))
+        (x1, y1) = win32gui.ClientToScreen(self.hwnd, (250,185))
+        (x2, y2) = win32gui.ClientToScreen(self.hwnd, (353,223))
 
         game_level = 0
         time_start = datetime.now()
