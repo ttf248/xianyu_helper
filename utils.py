@@ -121,12 +121,18 @@ class Utils():
             logger.debug("OCR耗时：{}ms", (end - start) * 1000)
             spacer = 100
             for detection in result:
-                top_left = tuple(detection[0][0])
-                bottom_right = tuple(detection[0][2])
-                text = detection[1]
-                img = cv2.rectangle(img,top_left,bottom_right,(0,255,0),1)
-                img = self.cv2ImgAddText(img, text, 100, 100 + spacer)
-                spacer+=20
+                # 异常保护
+                try:
+                    top_left = tuple(detection[0][0])
+                    bottom_right = tuple(detection[0][2])
+                    text = detection[1]
+                    img = cv2.rectangle(img,top_left,bottom_right,(0,255,0),1)
+                    #img = self.cv2ImgAddText(img, text, 100, 100 + spacer)
+                    img = self.cv2ImgAddText(img, text, top_left[0], top_left[1] + 20)
+                    spacer+=20
+                except Exception as e:
+                    logger.error(e)
+                    continue          
         
         #cv2.namedWindow("screenshot", cv2.WINDOW_NORMAL)
         #cv2.resizeWindow('screenshot', 360, 640)
@@ -135,6 +141,8 @@ class Utils():
 
 
 if __name__ == '__main__':
+    import torch
+    print("Hello Pytorch{}".format(torch.__version__))
     utils = Utils(easyocr.Reader(['ch_sim', 'en']))
     utils.load_res()
     utils.get_img(pop_up_window=True)

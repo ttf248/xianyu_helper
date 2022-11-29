@@ -2,6 +2,7 @@ autopep8==2.0.0
 certifi==2022.9.24
 charset-normalizer==2.1.1
 colorama==0.4.6
+comtypes==1.1.14
 easyocr==1.6.2
 idna==3.4
 imageio==2.22.4
@@ -27,7 +28,8 @@ Shapely==1.8.5.post1
 six==1.16.0
 tifffile==2022.10.10
 tomli==2.0.1
-torch==1.13.0
+torch==1.13.0+cu117
+torchaudio==0.13.0+cu117
 torchvision==0.14.0
 typing_extensions==4.4.0
 urllib3==1.26.12
