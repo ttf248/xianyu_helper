@@ -32,7 +32,7 @@ class xianyu:
         logger.info("咸鱼之王屏幕坐标：{} {} {} {}", self.left, self.top, self.right, self.bottom)
 
         # 设置为前台
-        win32gui.SetForegroundWindow(self.hwnd)
+        #win32gui.SetForegroundWindow(self.hwnd)
 
         # 公用OCR，初始化太慢
         self.reader = ocr_reader
@@ -165,6 +165,7 @@ class xianyu:
 
 
 if __name__ == '__main__':
-    xianyu = xianyu(easyocr.Reader(['ch_sim', 'en']))
+    # 默认不启用GPU，费电
+    xianyu = xianyu(easyocr.Reader(['ch_sim', 'en'], gpu=False))
     xianyu.task_auto_pass()
     xianyu.task_auto_answer()
