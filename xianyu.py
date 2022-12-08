@@ -159,9 +159,11 @@ class xianyu:
                 img = ImageGrab.grab(bbox=(x1, y1, x2, y2))
                 result = self.reader.readtext(cv2.cvtColor(
                     nm.array(img), cv2.COLOR_BGR2GRAY))
-                new_game_level = result[0][1]
-                # 仅保留数字
-                new_game_level = re.sub("\D", "", new_game_level)
+
+                if len(result) > 0:
+                    new_game_level = result[0][1]
+                    # 仅保留数字
+                    new_game_level = re.sub("\D", "", new_game_level)
 
                 if len(new_game_level) <= 0:
                     continue
