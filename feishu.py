@@ -67,6 +67,22 @@ class FeiShutalkChatbot(object):
         logger.debug('text类型：%s' % data)
         return self.post(data)
 
+    def send_interactive(self, title, text):
+        """
+        消息类型为interactive类型
+        :param title: 消息标题
+        :param text: 消息内容
+        :return: 返回消息发送结果
+        """
+        data = {"msg_type": "interactive", "card":
+                {"config": {"wide_screen_mode": True},
+                "elements": [{"tag": "div", "text": {"content": text, "tag": "lark_md"}}], 
+                "header": {"template": "blue", "title": {"content": "🎉 " + title, "tag": "plain_text"}}}}
+                
+        # dic 转成 JSON 字符串 utf-8
+        data = json.dumps(data, ensure_ascii=False)
+        return self.post(data.encode('utf-8'))
+
     def send_post(self, title, text):
         """
         消息类型为post类型
@@ -136,3 +152,4 @@ if __name__ == '__main__':
     feishu = FeiShutalkChatbot(
         "https://open.feishu.cn/open-apis/bot/v2/hook/79129e41-d4f3-429a-8963-ba04a4dcf4ed")
     feishu.send_post("测试消息", "测试消息")
+    feishu.send_interactive("测试消息", "**测试**消息")

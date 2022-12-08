@@ -164,7 +164,7 @@ class xianyu:
                     time_cost = round((datetime.now() - time_start).seconds / 60, 2)
                     time_start = datetime.now()
                     logger.info("关卡：{}，耗时：{} 分钟", game_level, time_cost)
-                    self.feishu.send_post("推图进度", "关卡：{}, 耗时：{} 分钟".format(game_level, time_cost))
+                    self.feishu.send_interactive("推图进度", "当前进度：{} 关\n上次耗时：{} 分钟".format(game_level, time_cost))
 
             windows.left_click_position(self.hwnd, 299, 783, 0.01)
 
