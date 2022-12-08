@@ -5,6 +5,7 @@ import windows
 import win32gui
 import utils
 import cv2
+from feishu import FeiShutalkChatbot
 import numpy as nm
 from datetime import datetime
 from loguru import logger
@@ -36,6 +37,8 @@ class xianyu:
 
         # 公用OCR，初始化太慢
         self.reader = ocr_reader
+
+        self.feishu = FeiShutalkChatbot("https://open.feishu.cn/open-apis/bot/v2/hook/79129e41-d4f3-429a-8963-ba04a4dcf4ed")
 
     def read_ans(self, file_name):
         """读取答案"""
@@ -151,15 +154,17 @@ class xianyu:
         loop_count = 0
         while True:
             loop_count = loop_count + 1
-            if loop_count % 1000 == 0:
+            if loop_count % 100 == 0:
                 img = ImageGrab.grab(bbox=(x1, y1, x2, y2))
                 result = self.reader.readtext(cv2.cvtColor(
                     nm.array(img), cv2.COLOR_BGR2GRAY))
                 if len(result) > 0 and result[0][1] != game_level:
                     game_level = result[0][1]
-                    time_consume = (datetime.now() - time_start)
+                    # 计算消耗的时间 单位 分钟，保留两位小数
+                    time_cost = round((datetime.now() - time_start).seconds / 60, 2)
                     time_start = datetime.now()
-                    logger.info("检测到关卡变动：{}, 耗时：{}", game_level, time_consume)
+                    logger.info("关卡：{}，耗时：{} 分钟", game_level, time_cost)
+                    self.feishu.post("推图进度", "关卡：{}, 耗时：{} 分钟".format(game_level, time_cost))
 
             windows.left_click_position(self.hwnd, 299, 783, 0.01)
 
