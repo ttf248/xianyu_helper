@@ -1,4 +1,5 @@
 import json
+import re
 import time
 import easyocr
 import windows
@@ -18,7 +19,8 @@ class xianyu:
     def __init__(self, ocr_reader):
         """初始化"""
 
-        self.feishu = FeiShutalkChatbot("https://open.feishu.cn/open-apis/bot/v2/hook/79129e41-d4f3-429a-8963-ba04a4dcf4ed")
+        self.feishu = FeiShutalkChatbot(
+            "https://open.feishu.cn/open-apis/bot/v2/hook/79129e41-d4f3-429a-8963-ba04a4dcf4ed")
 
         # 获取句柄
         self.hwnd = windows.find_hwd("Chrome_WidgetWin_0", "咸鱼之王")
@@ -29,13 +31,15 @@ class xianyu:
 
         # 窗口坐标
         self.left, self.top, self.right, self.bottom = 0, 0, 0, 0
-        
+
         # 获取窗口左上角和右下角坐标
-        self.left, self.top, self.right, self.bottom = windows.get_window_pos(self.hwnd)
-        logger.info("咸鱼之王屏幕坐标：{} {} {} {}", self.left, self.top, self.right, self.bottom)
+        self.left, self.top, self.right, self.bottom = windows.get_window_pos(
+            self.hwnd)
+        logger.info("咸鱼之王屏幕坐标：{} {} {} {}", self.left,
+                    self.top, self.right, self.bottom)
 
         # 设置为前台
-        #win32gui.SetForegroundWindow(self.hwnd)
+        # win32gui.SetForegroundWindow(self.hwnd)
 
         # 公用OCR，初始化太慢
         self.reader = ocr_reader
@@ -59,21 +63,19 @@ class xianyu:
                     self.ans.append(js)
                 except Exception as e:
                     logger.debug(e)
-            
+
             logger.info("读取题库：{}", len(self.ans))
 
-    
     def get_task(self):
         """识别当前任务"""
-
-
 
     def task_auto_answer(self):
         """自动答题"""
 
         while True:
             # 读取题目
-            img = ImageGrab.grab(bbox=(self.left+25, self.top+141, self.left+25 + 419, self.top+141 + 130))
+            img = ImageGrab.grab(
+                bbox=(self.left+25, self.top+141, self.left+25 + 419, self.top+141 + 130))
 
             # 设置偏色，提高识别度
             for i in range(img.width):
@@ -103,7 +105,7 @@ class xianyu:
             # 识别题目不变，无需操作
             if question_str != question_str_old:
                 question_str_old = question_str
- 
+
                 similar = 0
                 # 最低相似度
                 min_similar = 0.6
@@ -116,11 +118,11 @@ class xianyu:
                         # 更新相似度
                         result = item
                         similar = ret
-                
+
                 logger.debug("题目识别结果：{}, 相似度：{}", question_str, similar)
                 if len(result) > 0:
                     logger.info("题库对比：{}，答案：{}", result['q'], result['ans'])
-                
+
                 # 相似度低于最低值，不做操作
                 if similar > min_similar:
                     #file_name = time.strftime("%Y-%m-%d_%H-%M-%S") + ".jpg"
@@ -130,16 +132,15 @@ class xianyu:
                         windows.left_click_position(self.hwnd, 166, 930, 0.02)
                     if (result['ans'] == '错'):
                         windows.left_click_position(self.hwnd, 422, 923, 0.02)
-            
+
             time.sleep(0.2)
 
-            
     def task_auto_pass(self):
         """自动过关"""
 
         # 计算关卡位置
-        (x1, y1) = win32gui.ClientToScreen(self.hwnd, (250,185))
-        (x2, y2) = win32gui.ClientToScreen(self.hwnd, (353,223))
+        (x1, y1) = win32gui.ClientToScreen(self.hwnd, (250, 185))
+        (x2, y2) = win32gui.ClientToScreen(self.hwnd, (353, 223))
 
         game_level = 0
         time_start = datetime.now()
@@ -158,13 +159,22 @@ class xianyu:
                 img = ImageGrab.grab(bbox=(x1, y1, x2, y2))
                 result = self.reader.readtext(cv2.cvtColor(
                     nm.array(img), cv2.COLOR_BGR2GRAY))
-                if len(result) > 0 and result[0][1] != game_level:
-                    game_level = result[0][1]
+                new_game_level = result[0][1]
+                # 仅保留数字
+                new_game_level = re.sub("\D", "", new_game_level)
+
+                if len(new_game_level) <= 0:
+                    continue
+
+                if  int(new_game_level) > int(game_level):
+                    game_level = new_game_level
                     # 计算消耗的时间 单位 分钟，保留两位小数
-                    time_cost = round((datetime.now() - time_start).seconds / 60, 2)
+                    time_cost = round(
+                        (datetime.now() - time_start).seconds / 60, 2)
                     time_start = datetime.now()
                     logger.info("关卡：{}，耗时：{} 分钟", game_level, time_cost)
-                    self.feishu.send_interactive("推图进度", "当前进度：{} 关\n上次耗时：{} 分钟".format(game_level, time_cost))
+                    self.feishu.send_interactive(
+                        "推图进度", "当前进度：{} 关\n上次耗时：{} 分钟".format(game_level, time_cost))
 
             windows.left_click_position(self.hwnd, 299, 783, 0.01)
 
