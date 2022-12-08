@@ -18,6 +18,8 @@ class xianyu:
     def __init__(self, ocr_reader):
         """初始化"""
 
+        self.feishu = FeiShutalkChatbot("https://open.feishu.cn/open-apis/bot/v2/hook/79129e41-d4f3-429a-8963-ba04a4dcf4ed")
+
         # 获取句柄
         self.hwnd = windows.find_hwd("Chrome_WidgetWin_0", "咸鱼之王")
 
@@ -37,8 +39,6 @@ class xianyu:
 
         # 公用OCR，初始化太慢
         self.reader = ocr_reader
-
-        self.feishu = FeiShutalkChatbot("https://open.feishu.cn/open-apis/bot/v2/hook/79129e41-d4f3-429a-8963-ba04a4dcf4ed")
 
     def read_ans(self, file_name):
         """读取答案"""
@@ -164,7 +164,7 @@ class xianyu:
                     time_cost = round((datetime.now() - time_start).seconds / 60, 2)
                     time_start = datetime.now()
                     logger.info("关卡：{}，耗时：{} 分钟", game_level, time_cost)
-                    self.feishu.post("推图进度", "关卡：{}, 耗时：{} 分钟".format(game_level, time_cost))
+                    self.feishu.send_post("推图进度", "关卡：{}, 耗时：{} 分钟".format(game_level, time_cost))
 
             windows.left_click_position(self.hwnd, 299, 783, 0.01)
 

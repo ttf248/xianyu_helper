@@ -67,35 +67,26 @@ class FeiShutalkChatbot(object):
         logger.debug('text类型：%s' % data)
         return self.post(data)
 
-    def post(self, title, text):
+    def send_post(self, title, text):
+        """
+        消息类型为post类型
+        :param title: 消息标题
+        :param text: 消息内容
+        :return: 返回消息发送结果
+        """
+        data = {"msg_type": "post", "content": {"post": {
+            "zh_cn": {"title": title, "content": [[{"tag": "text", "text": text}]]}}}}
+        # dic 转成 JSON 字符串 utf-8
+        data = json.dumps(data, ensure_ascii=False)
+        return self.post(data.encode('utf-8'))
+
+    def post(self, data):
         """
         发送消息（内容UTF-8编码）
         :param data: 消息数据（字典）
         :return: 返回消息发送结果
         """
         try:
-            data = json.loads('''{
-                "msg_type": "post",
-                "content": {
-                    "post": {
-                        "zh_cn": {
-                            "title": "{title}",
-                            "content": [
-                                [{
-                                        "tag": "text",
-                                        "text": "{text}"
-                                }
-                                ]
-                            ]
-                        }
-                    }
-                }
-            }''')
-            # data 转成字符串
-            data = json.dumps(data)
-            data = data.replace("{title}", title)
-            data = data.replace("{text}", text)
-            data = data.encode('utf-8')
             response = requests.post(
                 self.webhook, headers=self.headers, data=data, verify=False)
         except requests.exceptions.HTTPError as exc:
@@ -138,3 +129,10 @@ class FeiShutalkChatbot(object):
                     requests.post(self.webhook, headers=self.headers,
                                   data=json.dumps(error_data))
                 return result
+
+
+# main 函数
+if __name__ == '__main__':
+    feishu = FeiShutalkChatbot(
+        "https://open.feishu.cn/open-apis/bot/v2/hook/79129e41-d4f3-429a-8963-ba04a4dcf4ed")
+    feishu.send_post("测试消息", "测试消息")
