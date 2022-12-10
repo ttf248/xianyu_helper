@@ -167,16 +167,18 @@ class xianyu:
 
                 if len(new_game_level) <= 0:
                     continue
-
-                if  int(new_game_level) > int(game_level):
-                    game_level = new_game_level
+                # 推进的关卡数量
+                level_count = int(new_game_level) - int(game_level)
+                # 前台挂机：关卡递增是有序的; 后台挂机：关卡递增是无序的，兼容识别异常的情况
+                if  int(new_game_level) == int(game_level) + 1 or (level_count > 0 and level_count < 1000):
                     # 计算消耗的时间 单位 分钟，保留两位小数
                     time_cost = round(
-                        (datetime.now() - time_start).seconds / 60, 2)
+                        (datetime.now() - time_start).seconds / 60 / level_count, 2)
                     time_start = datetime.now()
-                    logger.info("关卡：{}，耗时：{} 分钟", game_level, time_cost)
+                    logger.info("关卡：{}，进度：{}，平均耗时：{} 分钟", new_game_level, level_count, time_cost)
                     self.feishu.send_interactive(
-                        "推图进度", "当前进度：{} 关\n上次耗时：{} 分钟".format(game_level, time_cost))
+                        "推图进度", "当前关卡：{} 关\n推进数量：{}\n平均耗时：{} 分钟".format(game_level, level_count, time_cost))
+                    game_level = new_game_level
 
             windows.left_click_position(self.hwnd, 299, 783, 0.01)
 
