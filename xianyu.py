@@ -165,7 +165,7 @@ class xianyu:
                     # 仅保留数字
                     new_game_level = re.sub("\D", "", new_game_level)
 
-                if len(new_game_level) <= 0:
+                if len(new_game_level) <= 0: 
                     continue
                 # 推进的关卡数量
                 level_count = int(new_game_level) - int(game_level)
@@ -183,8 +183,22 @@ class xianyu:
             windows.left_click_position(self.hwnd, 299, 783, 0.01)
 
 
+    def task_auto_tower(self):
+        loop_count = 0
+        while True:
+            windows.left_click_position(self.hwnd, 302,1018, 0.01)
+            windows.left_click_position(self.hwnd, 73,971, 0.01)
+            # 此位置不能一直点击，会导致无法进入下一个步骤
+            # 每循环 100此，点击一次
+            loop_count = loop_count + 1
+            if loop_count % 100 == 0:
+                windows.left_click_position(self.hwnd, 304,760, 0.01)
+
+
+
 if __name__ == '__main__':
     # 默认不启用GPU，费电
     xianyu = xianyu(easyocr.Reader(['ch_sim', 'en'], gpu=False))
     xianyu.task_auto_pass()
+    xianyu.task_auto_tower()
     xianyu.task_auto_answer()
