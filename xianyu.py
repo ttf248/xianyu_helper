@@ -213,6 +213,18 @@ class xianyu:
                         logger.info("小鱼干不足，结束推塔")
                         sys.exit()
 
+    def task_auto_fish(self):
+        '''按照坐标直接来，延迟多点，问题不大，比我手动来省事'''
+        while True:
+            logger.info("Task auto fish running")
+            windows.left_click_position(self.hwnd, 170,884, 1.5)
+            windows.left_click_position(self.hwnd, 464,603, 1.5)
+            windows.left_click_position(self.hwnd, 308,706, 1.5)
+            # 等中间的钓鱼动画
+            time.sleep(8)
+            windows.left_click_position(self.hwnd, 301,943, 1.5)
+            # 等鱼钩收集动画
+            time.sleep(5)
 
 
 if __name__ == '__main__':
@@ -222,5 +234,6 @@ if __name__ == '__main__':
     # xianyu.task_auto_pass()
     # 自动推塔
     xianyu.task_auto_tower()
-    # 自动答题
-    xianyu.task_auto_answer()
+    # # 自动答题
+    # xianyu.task_auto_answer()
+    xianyu.task_auto_fish()
