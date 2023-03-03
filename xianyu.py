@@ -150,6 +150,7 @@ class xianyu:
             nm.array(img), cv2.COLOR_BGR2GRAY))
         if len(result) > 0:
             game_level = result[0][1]
+            game_level = re.sub("\D", "", game_level)
             logger.info("启动脚本，检测当前关卡：{}", game_level)
 
         loop_count = 0
@@ -181,6 +182,7 @@ class xianyu:
                     game_level = new_game_level
 
             windows.left_click_position(self.hwnd, 299, 783, 0.01)
+            windows.left_click_position(self.hwnd, 308, 971, 0.01)
 
 
     def task_auto_tower(self):
@@ -194,11 +196,26 @@ class xianyu:
             if loop_count % 100 == 0:
                 windows.left_click_position(self.hwnd, 304,760, 0.01)
 
+                # 计算关卡位置
+                (x1, y1) = win32gui.ClientToScreen(self.hwnd, (215, 340))
+                (x2, y2) = win32gui.ClientToScreen(self.hwnd, (396, 606))
+                img = ImageGrab.grab(bbox=(x1, y1, x2, y2))
+                result = self.reader.readtext(cv2.cvtColor(nm.array(img), cv2.COLOR_BGR2GRAY))
+                for item in result:
+                    if item[1].find('奖励') > 0:
+                        logger.info("薅羊毛成功")
+                        windows.left_click_position(self.hwnd, 55,1021, 2)
+                        windows.left_click_position(self.hwnd, 311,333, 2)
+                        break
+
 
 
 if __name__ == '__main__':
     # 默认不启用GPU，费电
     xianyu = xianyu(easyocr.Reader(['ch_sim', 'en'], gpu=False))
-    xianyu.task_auto_pass()
+    # 自动推图
+    # xianyu.task_auto_pass()
+    # 自动推塔
     xianyu.task_auto_tower()
+    # 自动答题
     xianyu.task_auto_answer()
