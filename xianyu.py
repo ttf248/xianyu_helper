@@ -1,5 +1,6 @@
 import json
 import re
+import sys
 import time
 import easyocr
 import windows
@@ -193,7 +194,7 @@ class xianyu:
             # 此位置不能一直点击，会导致无法进入下一个步骤
             # 每循环 100此，点击一次
             loop_count = loop_count + 1
-            if loop_count % 100 == 0:
+            if loop_count % 10 == 0:
                 windows.left_click_position(self.hwnd, 304,760, 0.01)
 
                 # 计算关卡位置
@@ -202,11 +203,15 @@ class xianyu:
                 img = ImageGrab.grab(bbox=(x1, y1, x2, y2))
                 result = self.reader.readtext(cv2.cvtColor(nm.array(img), cv2.COLOR_BGR2GRAY))
                 for item in result:
-                    if item[1].find('奖励') > 0:
+                    logger.debug(item)
+                    if item[1].find('奖励') > 0 and item[1].find('领取') > 0:
                         logger.info("薅羊毛成功")
                         windows.left_click_position(self.hwnd, 55,1021, 2)
                         windows.left_click_position(self.hwnd, 311,333, 2)
                         break
+                    if item[1].find('鱼干') > 0:
+                        logger.info("小鱼干不足，结束推塔")
+                        sys.exit()
 
 
 
