@@ -209,7 +209,7 @@ class xianyu:
                         windows.left_click_position(self.hwnd, 55,1021, 2)
                         windows.left_click_position(self.hwnd, 311,333, 2)
                         break
-                    if item[1].find('鱼干') > 0:
+                    if item[1].find('鱼干') > 0 and item[1].find('获得') == -1:
                         logger.info("小鱼干不足，结束推塔")
                         sys.exit()
 
@@ -229,11 +229,11 @@ class xianyu:
 
 if __name__ == '__main__':
     # 默认不启用GPU，费电
-    xianyu = xianyu(easyocr.Reader(['ch_sim', 'en'], gpu=False))
+    xianyu = xianyu(easyocr.Reader(['ch_sim', 'en'], gpu=True))
     # 自动推图
     # xianyu.task_auto_pass()
     # 自动推塔
     xianyu.task_auto_tower()
     # # 自动答题
-    # xianyu.task_auto_answer()
+    xianyu.task_auto_answer()
     xianyu.task_auto_fish()
